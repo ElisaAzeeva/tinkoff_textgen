@@ -25,7 +25,9 @@ class Training:
         return sentence.split()
 
     def get_model(self):
-        model={}
+        #model={}
+        import json
+        model=json.dumps({})
         self.sentences=self.get_sentences()
         for sentence in self.sentences:
             words= self.get_words_in_sentence(sentence)
@@ -37,15 +39,23 @@ class Training:
                 while i<len(words)-1:
                     key= next(itr_key)
                     value=next(itr_val)
-                    if key in model.keys():
-                        model[key].append(value)
-                        #[model[key],value]
+                    #if key in model.keys():
+                    if key in model:
+                        #model[key].append(value)
+                        if value in model[key]:                            
+                            model[key][value]+=1                          
+                        else:
+                            model[key].update({value:1}) 
+                    elif isinstance(model,str):
+                        #model[key]=[value]
+                        model={key:{value:1}}
                     else:
-                        model[key]=[value]
+                        model.update({key:{value:1}})    
                     i+=1
-        model_file = open(self._output,"w")
-        model_file.write("%s" % model)
-        model_file.close()
+        js_model = json.dumps(model,indent=4,sort_keys=False,ensure_ascii=False) 
+        text_file = open(self._output,"w")
+        text_file.write("%s" % js_model)
+        text_file.close()
 
 #Program
 model= Training(args.input,args.output)
